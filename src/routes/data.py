@@ -25,7 +25,7 @@ async def upload(project_id: str, file: UploadFile = None, app_settings: Setting
         return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content={"message": result_signal})
 
     project_dir_path = ProjectController().get_project_path(project_id=project_id)
-    file_path = data_controller.generate_unique_file_name(orignal_file_name=file.filename, project_id=project_id)
+    file_path, file_id = data_controller.generate_unique_filepath(orignal_file_name=file.filename, project_id=project_id)
 
     try:
         async with aiofiles.open(file_path, "wb") as f:
@@ -35,4 +35,4 @@ async def upload(project_id: str, file: UploadFile = None, app_settings: Setting
         logger.error(f"Error uploading file: {e}")
         return JSONResponse(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content={"signal": ResponseSignal.FILE_UPLOAD_FAILED.value})
 
-    return JSONResponse(content={"signal": ResponseSignal.FILE_UPLOAD_SUCCESS.value})
+    return JSONResponse(content={"signal": ResponseSignal.FILE_UPLOAD_SUCCESS.value, "file_id": file_id})
